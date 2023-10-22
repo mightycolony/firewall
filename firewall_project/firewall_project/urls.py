@@ -16,9 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from rules_fetcher_display import views
+from rules_fetcher_display.views import combined_rules
+from rules_adding.views import add
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.pre_rules,name='rules')
+    path('', combined_rules,name='rules'),
+    path('add/', add,name='adding')
 ]
