@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rules_fetcher_display',
-    'rules_adding'
+    'rules_adding',
+    'edit_delete_app'
 ]
 
 MIDDLEWARE = [

@@ -6,14 +6,20 @@ from django.shortcuts import redirect
 
 # Create your views here.
 def add(request):
-   form = forms.addform()
 
    if request.method == "POST":
-      form = forms.addform(request.POST) 
+      routing = request.POST.get('routing')
+
+      if routing == "prerouting": 
+        form = forms.preform(request.POST) 
+      elif routing == "postrouting":
+          form = forms.postform(request.POST)
+      else:
+          form = forms.preform(request.POST)
+
       if form.is_valid():
                data = form.cleaned_data
                routing=data['routing']
-               print(routing)
                if routing == "prerouting":   
                    print(routing)
                    prerouting.objects.get_or_create(**data)

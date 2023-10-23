@@ -1,0 +1,1 @@
+CREATE TABLE "rules_fetcher_display_prerouting" ("id" integer NOT NULL PRIMARY KEY AUTOINCREMENT, "routing" varchar(10) NOT NULL, "source_ip" varchar(18) NOT NULL, "protocol" varchar(3) NOT NULL, "destination_ip" varchar(18) NOT NULL, "destination_port" varchar(3) NOT NULL, "source_port" varchar(6) NOT NULL)
