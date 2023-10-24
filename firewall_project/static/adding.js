@@ -104,12 +104,24 @@ $(document).ready(function() {
 
 
 //save
-
+function myFunction(val) { 
+    routing=val; 
+  } 
 
 
 $(document).ready(function() {
-    function enablesaving(values_changed) {
-        const saved_id = $(".save").data('object-id');
+
+
+    function enablesaving(saved_id,values_changed,sav_close,cells) {
+        
+        function disableEditing(cells) {
+            cells.each(function() {
+                $(this).prop('contenteditable', false);
+            });
+        }
+
+
+        console.log(saved_id)
         var myList = []; 
         values_changed.each(function() {
            var a=$(this).text().replace(/\n/g, '').trim().replace(/\s+/g, ' ');
@@ -119,36 +131,40 @@ $(document).ready(function() {
         });
         mydata=myList.pop()
         console.log(myList);
+        console.log(routing);
         $.ajax({
             type: 'POST',
-            url: `/save/${saved_id}/`,
+            url: `/save/${routing}/${saved_id}/`,
             data: JSON.stringify(myList),
             contentType: 'application/json',
             headers: {
                 'X-CSRFToken': getCookie('csrftoken'), 
             },
             success: function (response) {
+                
                 console.log(response);
+                sav_close.hide();
+                disableEditing(cells);
                 
             },
             error: function (xhr, errmsg, err) {
                 console.log(errmsg);
             }
         });
+
+    }
+    $(".save").click(function() {
+        const saved_id = $(this).data('object-id');
+        const values_changed = $(this).closest('tr').find('td');
+        const sav_close = $(this).closest('tr').find('.save');
+        const cells = $(this).closest('tr').find('td[contenteditable="true"]');
+        enablesaving(saved_id,values_changed,sav_close,cells)
         
 
 
 
-
-
-    }
-
-
-
-    $(".save").click(function() {
-        const values_changed = $(this).closest('tr').find('td');
-        enablesaving(values_changed)
     });
 });
+
 
 

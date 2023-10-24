@@ -80,7 +80,7 @@
         <td contenteditable="false">{{ value_pre.destination_port }}</td>
         <td >
           <button  type="button" class="edit btn btn-primary" >edit</button>
-          <button  style="display: none"  type="button"  data-object-id={{value_pre.id}} class="save btn btn-warning" >save</button>
+          <button  style="display: none"  type="button" onclick="myFunction('prerouting')" data-object-id={{value_pre.id}} class="save btn btn-warning" >save</button>
           <button  type="button" class="btn btn-danger" onclick="deleteRow2(this, 'preroute')" data-object-id={{value_pre.id}}>delete</button></td>
           
         </tr>
@@ -108,7 +108,7 @@
         <td  contenteditable="false">{{ value_post.destination_ip }}</td>
         <td>
           <button  type="button" class="edit btn btn-primary" >edit</button>
-          <button  style="display: none"  type="button" data-object-id={{value_post.id}} class="save btn btn-warning" >save</button>
+          <button  style="display: none"  type="button" onclick="myFunction('postrouting')"  data-object-id={{value_post.id}} class="save btn btn-warning" >save</button>
           <button  type="button" class="btn btn-danger" onclick="deleteRow2(this,'postroute')" data-object-id={{value_post.id}}>delete</button></td>
 
         </td>
