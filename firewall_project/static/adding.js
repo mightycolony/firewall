@@ -51,36 +51,35 @@ function toggleInput() {
 
 
 
-
 function getCookie(name) {
     var value = "; " + document.cookie;
 
     var parts = value.split("; " + name + "=");
     if (parts.length == 2) return parts.pop().split(";").shift();
 }
+//for deleting routes
+function deleteRow2(button,types) {
+            const object_id = $(button).data('object-id');
+            const res = confirm("Do you want to policy id delete"  + object_id+ "?")  
+            if (res == true){
+                console.log(object_id)
+                $.ajax({
+                    url: `/delete/${types}/${object_id}/`, 
+                    type: 'DELETE',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'), 
+                    },
+                    success: function(response) {
+                        $(button).closest('tr').remove();
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(error);
+                    }
 
-function deleteRow2(button) {
-            console.log(button)
-            console.log("deleteRow2 function called");
-            const object_id = $(button).data('object-id');  
-            console.log(object_id)
-            $.ajax({
-                url: `/delete/${object_id}/`, 
-                type: 'DELETE',
-                headers: {
-                    'X-CSRFToken': getCookie('csrftoken'), 
-                },
-                success: function(response) {
-                    $(button).closest('tr').remove();
-                },
-                error: function(xhr, status, error) {
-                    console.error(error);
-                }
-
-            });
+                });
+            }
         }
 
- 
 
 
 
@@ -103,33 +102,37 @@ $(document).ready(function() {
     });
 });
 
-//getting saveid
-function deleteRow2(button) {
-    const object_id = $(button).data('object-id'); 
-}
+
 //save
+
+
 
 $(document).ready(function() {
     function enablesaving(values_changed) {
+        const saved_id = $(".save").data('object-id');
         var myList = []; 
         values_changed.each(function() {
-           var a=$(this).text()
+           var a=$(this).text().replace(/\n/g, '').trim().replace(/\s+/g, ' ');
            myList.push(a);
-        
-        });
+           
 
+        });
+        mydata=myList.pop()
+        console.log(myList);
         $.ajax({
             type: 'POST',
-            url: '/ajax_example/',  // URL to your Django view
-            data: formData,  // Use the JavaScript object directly
-            dataType: 'json', // Specify the expected data type
+            url: `/save/${saved_id}/`,
+            data: JSON.stringify(myList),
+            contentType: 'application/json',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'), 
+            },
             success: function (response) {
-                // Handle the server's response here
                 console.log(response);
+                
             },
             error: function (xhr, errmsg, err) {
-                // Handle errors here
-                console.log(err);
+                console.log(errmsg);
             }
         });
         

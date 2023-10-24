@@ -18,12 +18,13 @@ from django.contrib import admin
 from django.urls import path
 from rules_fetcher_display.views import combined_rules
 from rules_adding.views import add
-from edit_delete_app.views import delete_object
+from edit_delete_app.views import delete_object,save_object
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', combined_rules,name='rules'),
     path('add/', add,name='adding'),
-    path('delete/<int:object_id>/',delete_object,name='delete_object')
+    path('delete/<str:types>/<int:object_id>/',delete_object,name='delete_object'),
+    path('save/<int:saved_id>/',save_object,name='save_object')
 ]

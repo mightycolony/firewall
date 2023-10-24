@@ -59,13 +59,13 @@
     <thead>
       <tr id="columns">
         <p>PREROUTING</p>
-        <th scope="col">SN</th>
-        <th scope="col">source_ip</th>
-        <th scope="col">source_port</th>
-        <th scope="col">protocol</th>
-        <th scope="col">destination_ip</th>
-        <th scope="col">destination_port</th>
-        <th scope="col">options</th>
+        <th scope="col">Policy ID</th>
+        <th scope="col">Source IP</th>
+        <th scope="col">Source Port</th>
+        <th scope="col">Protocol</th>
+        <th scope="col">Destination IP</th>
+        <th scope="col">Destination Port</th>
+        <th scope="col">Options</th>
 
       </tr>
     </thead>
@@ -80,9 +80,10 @@
         <td contenteditable="false">{{ value_pre.destination_port }}</td>
         <td >
           <button  type="button" class="edit btn btn-primary" >edit</button>
-          <button  style="display: none"  type="button" class="save btn btn-warning" >save</button>
-          <button  type="button" class="btn btn-danger" onclick="deleteRow2(this)" data-object-id={{value_pre.id}}>delete</button></td>
-      </tr>
+          <button  style="display: none"  type="button"  data-object-id={{value_pre.id}} class="save btn btn-warning" >save</button>
+          <button  type="button" class="btn btn-danger" onclick="deleteRow2(this, 'preroute')" data-object-id={{value_pre.id}}>delete</button></td>
+          
+        </tr>
     {% endfor %}
 
     </tbody>
@@ -94,9 +95,9 @@
     <thead>
       <tr>
         <p>POSTROUTING</p>
-        <th scope="col">SN</th>
-        <th scope="col">source_ip</th>
-        <th scope="col">destination_ip</th>
+        <th scope="col">Policy ID</th>
+        <th scope="col">Source IP</th>
+        <th scope="col">Destination IP</th>
       </tr>
     </thead>
     <tbody>
@@ -107,8 +108,9 @@
         <td  contenteditable="false">{{ value_post.destination_ip }}</td>
         <td>
           <button  type="button" class="edit btn btn-primary" >edit</button>
-          <button  style="display: none"  type="button" class="save btn btn-warning" >save</button>
-          <button  type="button" data-object-id={{value_post.id}} onclick="deleteRow2(this)" class=" btn btn-primary">delete</button>
+          <button  style="display: none"  type="button" data-object-id={{value_post.id}} class="save btn btn-warning" >save</button>
+          <button  type="button" class="btn btn-danger" onclick="deleteRow2(this,'postroute')" data-object-id={{value_post.id}}>delete</button></td>
+
         </td>
           
       </tr>
