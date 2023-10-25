@@ -8,9 +8,7 @@ sys.path.append("python_scripts")
 
 from python_scripts.sshcall import SSH
 
-server_ip="10.62.32.234"
-user_name="root"
-password="wZby5y5GBZy5y1y5y5"
+
 
 connection_call=SSH()
 def tables_gen_pre(sourceip,sourceport,protocol,destinationip,destinationport):
