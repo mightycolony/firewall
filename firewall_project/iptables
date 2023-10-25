@@ -4,3 +4,6 @@
 -A PREROUTING -d 172.20.1.19/32 -p tcp -m tcp --dport 80 -j DNAT --to-destination 172.20.1.54:80
 -A POSTROUTING -d 172.20.32.182/32 -j SNAT --to-source 172.20.131.145
 -A POSTROUTING -d 172.20.1.54/32 -j SNAT --to-source 172.20.1.19
+
+
+iptables -t nat -A PREROUTING -d 1.1.1.1/32 -p tcp -m tcp --dport 22 -j DNAT --to-destination 2.2.2.2:22
