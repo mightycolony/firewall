@@ -11,10 +11,18 @@ from python_scripts.sshcall import SSH
 
 
 connection_call=SSH()
-def tables_gen_pre(sourceip,sourceport,protocol,destinationip,destinationport):
-    tables="iptables -t nat -A PREROUTING -d {} -p {} -m {} --dport {} -j DNAT --to-destination {}:{}".format(sourceip,protocol,protocol,sourceport,destinationip,destinationport)
-    return tables
- 
+def tables_gen_add(routing,sourceip,sourceport=None,protocol=None,destinationip=None,destinationport=None):
+    if routing == "prerouting":
+        tables="iptables -t nat -A PREROUTING -d {} -p {} -m {} --dport {} -j DNAT --to-destination {}:{}".format(sourceip,protocol,protocol,sourceport,destinationip,destinationport)
+        return tables
+    elif routing == "postrouting":
+        tables="iptables -t nat -A POSTROUTING -d {} -j SNAT --to-source {}".format(destinationip,sourceip)
+        return tables
+    elif routing == "both":
+        tables="iptables -t nat -A PREROUTING -d {} -p {} -m {} --dport {} -j DNAT --to-destination {}:{}".format(sourceip,protocol,protocol,sourceport,destinationip,destinationport)
+        tables2="iptables -t nat -A POSTROUTING -d {} -j SNAT --to-source {}".format(destinationip,sourceip)
+        return tables,tables2
+
 # Create your views here.
 def add(request):
 
@@ -31,29 +39,55 @@ def add(request):
       if form.is_valid():
                
                server_data=[]
+               server_data2=[]
                data = form.cleaned_data
                routing=data['routing']
                if routing == "prerouting":   
                    prerouting.objects.get_or_create(**data)
-                   server_data.append(form.cleaned_data['source_ip'])
-                   server_data.append(form.cleaned_data['source_port'])
-                   server_data.append(form.cleaned_data['protocol'])
-                   server_data.append(form.cleaned_data['destination_ip'])
-                   server_data.append(form.cleaned_data['destination_port'])
-    
-    
-                   cmd=tables_gen_pre(server_data[0],server_data[1],server_data[2],server_data[3],server_data[4])
+                   server_data.extend([
+                        form.cleaned_data['routing'],
+                        form.cleaned_data['source_ip'],
+                        form.cleaned_data['source_port'],
+                        form.cleaned_data['protocol'],
+                        form.cleaned_data['destination_ip'],
+                        form.cleaned_data['destination_port']
+                        ])
+                   cmd=tables_gen_add(routing=server_data[0],sourceip=server_data[1],sourceport=server_data[2],protocol=server_data[3],destinationip=server_data[4],destinationport=server_data[5])
                    print(cmd)
-                   connection_call.ssh_call(server_ip,user_name,password,cmd)
-   
+                   #connection_call.ssh_call(server_ip,user_name,password,cmd)
+
 
                elif routing == "postrouting":
-                  print(routing)
-                  postrouting.objects.get_or_create(source_ip=data['destination_ip'], destination_ip=data['source_ip'], routing=data['routing'])
+                   postrouting.objects.get_or_create(source_ip=data['destination_ip'], destination_ip=data['source_ip'], routing=data['routing'])
+                   server_data.extend([
+                        form.cleaned_data['routing'],
+                        form.cleaned_data['source_ip'],
+                        form.cleaned_data['destination_ip']
+                        ])
+                   cmd=tables_gen_add(routing=server_data[0],sourceip=server_data[1],destinationip=server_data[2])
+                   print(cmd)
                elif routing == "both":
                   print(routing)
                   prerouting.objects.get_or_create(**data)
+                  server_data.extend([
+                        form.cleaned_data['routing'],
+                        form.cleaned_data['source_ip'],
+                        form.cleaned_data['source_port'],
+                        form.cleaned_data['protocol'],
+                        form.cleaned_data['destination_ip'],
+                        form.cleaned_data['destination_port']
+                        ])
                   postrouting.objects.get_or_create(source_ip=data['destination_ip'], destination_ip=data['source_ip'], routing=data['routing'])
+                  server_data2.extend([
+                        form.cleaned_data['routing'],
+                        form.cleaned_data['source_ip'],
+                        form.cleaned_data['destination_ip']
+                        ])
+                  cmd,cmd2 = tables_gen_add(routing=server_data[0],sourceip=server_data[1],sourceport=server_data[2],protocol=server_data[3],destinationip=server_data[4],destinationport=server_data[5])
+               
+
+                  print(cmd)
+                  print(cmd2)
                
    return redirect('rules')
 
@@ -64,4 +98,3 @@ def add(request):
 
 
 
-#connection_call.ssh_call()
