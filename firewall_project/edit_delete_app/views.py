@@ -3,8 +3,11 @@ from django.shortcuts import redirect
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 import json
-import sys
-sys.path.append("python_scripts")
+
+from django.views.decorators.cache import never_cache
+from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.decorators import login_required
+
 
 def tables_gen_delete(routing,sourceip,sourceport=None,protocol=None,destinationip=None,destinationport=None):
     if routing == "preroute":
@@ -24,6 +27,10 @@ def tables_gen_save(routing,sourceip,sourceport=None,protocol=None,destinationip
 
 
 
+@never_cache
+@login_required
+
+@permission_required('rules_fetcher_display.view')
 def delete_object(request, object_id,types):
     try:
         if types == "preroute":
@@ -43,7 +50,9 @@ def delete_object(request, object_id,types):
 
 
 
-
+@never_cache
+@login_required
+@permission_required('rules_fetcher_display.view')
 def save_object_post(request,routing,saved_id):
     if routing == "postrouting":
         try:

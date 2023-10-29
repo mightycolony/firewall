@@ -15,17 +15,20 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
-from rules_fetcher_display.views import combined_rules
+from django.urls import path, include
+from rules_fetcher_display.views import combined_rules,user_login,user_logout
 from rules_adding.views import add
 from edit_delete_app.views import delete_object,save_object_post
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', combined_rules,name='rules'),
+    path('rules/', combined_rules,name='rules'),
+    path('',user_login,name="user_login"),
+    path('logout/',user_logout,name="user_logout"),
     path('add/', add,name='adding'),
     path('delete/<str:types>/<int:object_id>/',delete_object,name='delete_object'),
     path('save/<str:routing>/<int:saved_id>/',save_object_post,name='save_object_post'),
     
 ]
+

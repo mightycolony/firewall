@@ -4,13 +4,12 @@ from rules_adding import forms
 from rules_fetcher_display.models import prerouting,postrouting
 from django.shortcuts import redirect
 import sys
-sys.path.append("python_scripts")
+from django.views.decorators.cache import never_cache
+from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.decorators import login_required
 
-from python_scripts.sshcall import SSH
 
 
-
-connection_call=SSH()
 def tables_gen_add(routing,sourceip,sourceport=None,protocol=None,destinationip=None,destinationport=None):
     if routing == "prerouting":
         tables="iptables -t nat -A PREROUTING -d {} -p {} -m {} --dport {} -j DNAT --to-destination {}:{}".format(sourceip,protocol,protocol,sourceport,destinationip,destinationport)
@@ -24,6 +23,9 @@ def tables_gen_add(routing,sourceip,sourceport=None,protocol=None,destinationip=
         return tables,tables2
 
 # Create your views here.
+@never_cache
+@login_required
+@permission_required('rules_fetcher_display.edit')
 def add(request):
 
    if request.method == "POST":
