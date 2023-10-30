@@ -29,8 +29,7 @@ def tables_gen_save(routing,sourceip,sourceport=None,protocol=None,destinationip
 
 @never_cache
 @login_required
-
-@permission_required('rules_fetcher_display.view')
+@permission_required('rules_fetcher_display.edit')
 def delete_object(request, object_id,types):
     try:
         if types == "preroute":
@@ -52,7 +51,7 @@ def delete_object(request, object_id,types):
 
 @never_cache
 @login_required
-@permission_required('rules_fetcher_display.view')
+@permission_required('rules_fetcher_display.edit')
 def save_object_post(request,routing,saved_id):
     if routing == "postrouting":
         try:

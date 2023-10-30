@@ -50,7 +50,25 @@ function toggleInput() {
 }
 
 
+//popup
 
+const popup = document.getElementById('custom-popup');
+const policyId = document.getElementById('policy-id');
+const confirmButton = document.getElementById('popup-confirm');
+const cancelButton = document.getElementById('popup-cancel');
+
+function showPopup(id) {
+    policyId.textContent = id;
+    popup.style.display = 'block';
+}
+function hidePopup() {
+    popup.style.display = 'none';
+}
+cancelButton.addEventListener('click', function () {
+    hidePopup();
+});
+
+//get cookie
 function getCookie(name) {
     var value = "; " + document.cookie;
 
@@ -60,9 +78,8 @@ function getCookie(name) {
 //for deleting routes
 function deleteRow2(button,types) {
             const object_id = $(button).data('object-id');
-            const res = confirm("Do you want to policy id delete"  + object_id+ "?")  
-            if (res == true){
-                console.log(object_id)
+            showPopup(object_id);
+            confirmButton.addEventListener('click', function () { 
                 $.ajax({
                     url: `/delete/${types}/${object_id}/`, 
                     type: 'DELETE',
@@ -77,7 +94,11 @@ function deleteRow2(button,types) {
                     }
 
                 });
-            }
+            //}
+       
+            hidePopup();
+        });
+
         }
 
 
@@ -169,3 +190,19 @@ $(document).ready(function() {
 
 
 //user views
+
+
+//popup
+var userGroup = document.getElementById('user-group-data')
+var admingroup = userGroup.getAttribute('data-user-group');
+
+function showadmin() {
+    userGroup.style.display = 'block';
+}
+function hideadmin() {
+    userGroup.style.display = 'none';
+}
+
+if (admingroup == "READ_WRITE" )  {
+    showadmin()
+}

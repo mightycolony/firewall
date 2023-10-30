@@ -28,13 +28,17 @@ def post_rules(request):
 @login_required
 @or_permission_required('rules_fetcher_display.edit', 'rules_fetcher_display.view')
 def combined_rules(request):
-    
+
     pre_context = pre_rules(request)
     post_context = post_rules(request)
 
+    if request.user.is_authenticated:
+        user_group = request.user.groups.first()
+    else:
+        user_group = None
+
     # Merge the two context dictionaries into a single dictionary
-    combined_context = {**pre_context, **post_context}
-    print(combined_context)
+    combined_context = {**pre_context, **post_context,'user_group': user_group}
     return render(request, 'index.html', combined_context)
 
 
@@ -58,7 +62,10 @@ def user_login(request):
         if user:
             if user.is_active:
                 login(request,user) 
-                return HttpResponseRedirect(reverse('rules'))
+                if request.user.is_authenticated:
+                        user_group = request.user.groups.first()
+                        user_name = {'user_group': user_group}
+                return HttpResponseRedirect(reverse('rules')) 
             else:
                return HttpResponse("Account not active") 
         else:

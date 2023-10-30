@@ -18,7 +18,7 @@
 
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
-      <a class="navbar-brand" href="#">Navbar</a>
+      <a class="navbar-brand" href="#">FIREWALL</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -27,8 +27,8 @@
           <li class="nav-item">
               <a class="nav-link active" aria-current="page" href="{% url 'rules' %}">Home</a>
           </li>
-          <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="#">Admin</a>
+          <li  id="user-group-data" style="display: none" data-user-group="{{ user_group }}" class="nav-item">
+              <a class="nav-link active"  aria-current="page" href="{% url "admin:index" %}">Admin</a>
           </li>
           <li class="nav-item ml-auto">
               <a class="nav-link active" aria-current="page" href="{% url "user_logout" %}">Logout</a>
@@ -85,8 +85,8 @@
         <td contenteditable="false">{{ value_pre.destination_port }}</td>
         <td >
           <button  type="button" class="edit btn btn-primary" >edit</button>
-          <button  style="display: none"  type="button" onclick="myFunction('prerouting')" data-object-id={{value_pre.id}} class="save btn btn-warning"  {% if "your_app.can_do_something" not in user_permissions %}disabled{% endif %} >save</button>
-          <button  type="button" class="btn btn-danger" onclick="deleteRow2(this, 'preroute')" data-object-id={{value_pre.id}}  {% if "your_app.can_do_something" not in user_permissions %}disabled{% endif %} >delete</button></td>
+          <button  style="display: none"  type="button" onclick="myFunction('prerouting')" data-object-id={{value_pre.id}} class="save btn btn-warning"  >save</button>
+          <button  type="button" class="btn btn-danger" onclick="deleteRow2(this, 'preroute')" data-object-id={{value_pre.id}}   >delete</button></td>
           
         </tr>
     {% endfor %}
@@ -115,7 +115,7 @@
         <td>
           <button  type="button" class="edit btn btn-primary" >edit</button>
           <button  style="display: none"  type="button" onclick="myFunction('postrouting')"  data-object-id={{value_post.id}} class="save btn btn-warning" >save</button>
-          <button  type="button" class="btn btn-danger" onclick="deleteRow2(this,'postroute')" data-object-id={{value_post.id}}>delete</button></td>
+          <button  type="button" class="btn btn-danger"  onclick="deleteRow2(this,'postroute')" data-object-id={{value_post.id}}>delete</button></td>
 
         </td>
           
@@ -126,8 +126,25 @@
   </table>
 
 
-    <!-- ADD -->
-
+    <!-- POP-UP -->
+    <div id="custom-popup" class="modal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">CONFIRM?</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p id="con-text">Do you want to delete policy ID <span id="policy-id"></span>?</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button"  id="popup-confirm" class="btn btn-primary">Save changes</button>
+            <button type="button" id="popup-cancel" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  
 
 
 </body>
