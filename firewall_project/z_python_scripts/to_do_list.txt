@@ -1,0 +1,11 @@
+RULE AND INTERFACE add
+------------------------------------
+1. if we delete a interface if one port is removed means that's a problem  need not remove the interface
+2. if we add extra port for the same ip we need not to add the ip
+
+EXTRA FEATURES
+------------------------------------
+1.rw/ro mode > done
+2. sync from iptables to model bidrectional
+3.filter
+4.admin access page restrict
