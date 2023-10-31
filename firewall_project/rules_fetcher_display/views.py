@@ -8,7 +8,8 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 
 from z_python_scripts.custom_decorators import or_permission_required
-
+from django.shortcuts import redirect
+from django.contrib import messages
 
 # Create your views here.
 
@@ -37,8 +38,13 @@ def combined_rules(request):
     else:
         user_group = None
 
+    error_msg = request.session.get('error_msg')
+    if 'error_msg' in request.session:
+        del request.session['error_msg']
+
     # Merge the two context dictionaries into a single dictionary
-    combined_context = {**pre_context, **post_context,'user_group': user_group}
+    combined_context = {**pre_context, **post_context,'user_group': user_group,'error_msg':error_msg}
+    
     return render(request, 'index.html', combined_context)
 
 

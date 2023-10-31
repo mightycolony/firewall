@@ -206,3 +206,29 @@ function hideadmin() {
 if (admingroup == "READ_WRITE" )  {
     showadmin()
 }
+
+
+//errormsg
+
+document.addEventListener("DOMContentLoaded", function() {
+    const errorPopup = document.getElementById("error-popup");
+    const errorMessage = document.getElementById("data-error-msg");
+
+    console.log(errorMessage);
+    const parts = errorMessage.textContent.split(":");
+    console.log(parts);
+
+    function showErrorPopup() {
+        errorPopup.style.display = "block";
+    }
+
+    function closeErrorPopup() {
+        errorPopup.style.display = "none";
+    }
+
+    if (parts[1] !== " 0") {
+        showErrorPopup();
+    }
+
+    document.getElementById("close-popup").addEventListener("click", closeErrorPopup);
+});

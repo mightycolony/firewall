@@ -95,7 +95,6 @@
   </table>
 
 
-
 <table class="table table-dark table-striped">
     <thead>
       <tr>
@@ -126,6 +125,14 @@
   </table>
 
 
+
+<div id="error-popup"  style="display: none"  class="error-popup">
+  <span id="data-error-msg">{{ error_msg }}</span>
+  <button id="close-popup">Close</button>
+</div>
+
+
+
     <!-- POP-UP -->
     <div id="custom-popup" class="modal" tabindex="-1">
       <div class="modal-dialog">
@@ -146,6 +153,9 @@
     </div>
   
 
+
+
+  
 
 </body>
 <script src="{% static 'adding.js' %}"></script>

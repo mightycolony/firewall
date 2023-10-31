@@ -7,6 +7,8 @@ from django.views.decorators.cache import never_cache
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.decorators import login_required
 from z_python_scripts.ip_add_delete import ip_add
+from django.contrib import messages
+
 #from z_python_scripts import ip_add_delete
 
 def tables_gen_add(routing,sourceip,sourceport=None,protocol=None,destinationip=None,destinationport=None):
@@ -66,8 +68,12 @@ def add(request):
                    cmd=tables_gen_add(routing=server_data[0],sourceip=server_data[1],sourceport=server_data[2],protocol=server_data[3],destinationip=server_data[4],destinationport=server_data[5])
                    policyid=previous_object_id_pre +1
                    error_pre=ip_add(routing,"10.0.2.15","root","notu",policyid,cmd)
-                   print("returned error: {} with error code: {}".format(error_pre[0].strip("\n"), error_pre[1]))
-
+                   print(error_pre[1])
+                   if error_pre[1] != 0:
+                        print("returned error: {} with error code: {}".format(error_pre[0].strip("\n"), error_pre[1]))
+                        error_msg="returned error: {} with error code: {}".format(error_pre[0].strip("\n"), error_pre[1])
+                        request.session['error_msg'] = error_msg
+                    
 
                elif routing == "postrouting":
                    postrouting.objects.get_or_create(source_ip=data['destination_ip'], destination_ip=data['source_ip'], routing=data['routing'])
