@@ -8,9 +8,10 @@ def ssh_call(host,user,passwd,commands):
             for command in commands:
                 client.connect(host, username=user, password=passwd)
                 _stdin, _stdout,_stderr = client.exec_command(command)
-                output = _stderr.read().decode()
+                output=_stdout.read().decode()
+                output_err = _stderr.read().decode()
                 exit_status = _stdout.channel.recv_exit_status()
-                output_list=[output,exit_status]
+                output_list=[output,output_err,exit_status]
                 if exit_status != 0:
                      break
                     
@@ -26,18 +27,42 @@ def ssh_call(host,user,passwd,commands):
            client.close()
         return output_list
             
-def ip_add(routing,ip,user_name,password,policy_id,cmd):
+def ip_add(routing,ip,user_name,password,cmd,policy_id="None",source_ip="None",precmd="None",postcmd="None"):
+   
+        
     if routing == "prerouting":
-        content = f"auto bond0:{policy_id}\n\tiface bond0:{policy_id} inet static\n\taddress {ip}\n\tnetmask 255.255.255.0\n\tgateway 192.168.1.1"
-        command1 = f"echo '{content}' | sudo tee -a /etc/network/interfaces.d/bond0-{policy_id}"
-        command2=f"ifconfig bond0-{policy_id} up"
-        commands=[command1,command2,cmd]
-        op=ssh_call("10.0.2.15","root","notu",commands)
-        return op
+         content = f"auto bond0:{policy_id}\n\tiface bond0:{policy_id} inet static\n\taddress {source_ip}\n\tnetmask 255.255.255.0\n\tgateway 192.168.1.1"
+         command_check=f"ip a | grep -i {source_ip} | awk -F ' ' '{{print $2}}'"
+         checker=ssh_call(ip,user_name,password,[command_check])
+         checker_op=checker[0].strip('\n').split('/')[0]
+         #checker_op==checker[0].strip('\n')  #org_one with subnet
+         if checker_op != ip:
+            command1 = f"echo '{content}' | tee /etc/network/interfaces.d/bond0-{policy_id} > /dev/null"
+            command2=f"ifconfig bond0-{policy_id} up"
+            commands=[command1,command2,cmd]
+            op=ssh_call(ip,user_name,password,commands)
+            return op
+            
     elif routing == "postrouting":
-        op=ssh_call("10.0.2.15","root","notu",[cmd])
+        op=ssh_call(ip,user_name,password,[cmd])
         print(op)
-     
+    elif routing == "both":
+         if precmd == "cmd":
+             content = f"auto bond0:{policy_id}\n\tiface bond0:{policy_id} inet static\n\taddress {source_ip}\n\tnetmask 255.255.255.0\n\tgateway 192.168.1.1"
+             command_check=f"ip a | grep -i {source_ip} | awk -F ' ' '{{print $2}}'"
+             checker=ssh_call(ip,user_name,password,[command_check])
+             checker_op=checker[0].strip('\n').split('/')[0]
+             #checker_op==checker[0].strip('\n')  #org_one with subnet
+             if checker_op != ip:
+                command1 = f"echo '{content}' | tee /etc/network/interfaces.d/bond0-{policy_id} > /dev/null"
+                command2=f"ifconfig bond0-{policy_id} up"
+                commands=[command1,command2,cmd]
+                op=ssh_call(ip,user_name,password,commands)
+                return op
+         elif postcmd == "cmd2":
+            op_both=ssh_call(ip,user_name,password,[cmd])
+            print(op_both)
+         
 
 '''
 def del_add(policy_id):

@@ -209,26 +209,18 @@ if (admingroup == "READ_WRITE" )  {
 
 
 //errormsg
-
 document.addEventListener("DOMContentLoaded", function() {
     const errorPopup = document.getElementById("error-popup");
-    const errorMessage = document.getElementById("data-error-msg");
+    const errorMessage = document.getElementById("error-msg");
 
-    console.log(errorMessage);
-    const parts = errorMessage.textContent.split(":");
-    console.log(parts);
-
-    function showErrorPopup() {
-        errorPopup.style.display = "block";
+    const err_msg = errorPopup.getAttribute("data-error-msg")
+    errorMessage.textContent=err_msg;
+    if (err_msg !==0 && err_msg.trim() !== "None") {
+        console.log("hello")
+        errorPopup.style.display = 'block';
     }
 
-    function closeErrorPopup() {
-        errorPopup.style.display = "none";
-    }
-
-    if (parts[1] !== " 0") {
-        showErrorPopup();
-    }
-
-    document.getElementById("close-popup").addEventListener("click", closeErrorPopup);
+    document.getElementById("close-popup").addEventListener("click", function () {
+        errorPopup.style.display = 'none';
+    });
 });
