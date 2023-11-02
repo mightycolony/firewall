@@ -27,7 +27,7 @@ def ssh_call(host,user,passwd,commands):
            client.close()
         return output_list
             
-def ip_add(routing,ip,user_name,password,cmd,policy_id="None",source_ip="None",precmd="None",postcmd="None"):
+def ip_add(routing,ip,user_name,password,cmd,policy_id="None",source_ip="None",route="None"):
    
         
     if routing == "prerouting":
@@ -47,7 +47,8 @@ def ip_add(routing,ip,user_name,password,cmd,policy_id="None",source_ip="None",p
         op=ssh_call(ip,user_name,password,[cmd])
         print(op)
     elif routing == "both":
-         if precmd == "cmd":
+         print(route)
+         if route == "pre":
              content = f"auto bond0:{policy_id}\n\tiface bond0:{policy_id} inet static\n\taddress {source_ip}\n\tnetmask 255.255.255.0\n\tgateway 192.168.1.1"
              command_check=f"ip a | grep -i {source_ip} | awk -F ' ' '{{print $2}}'"
              checker=ssh_call(ip,user_name,password,[command_check])
@@ -59,7 +60,7 @@ def ip_add(routing,ip,user_name,password,cmd,policy_id="None",source_ip="None",p
                 commands=[command1,command2,cmd]
                 op=ssh_call(ip,user_name,password,commands)
                 return op
-         elif postcmd == "cmd2":
+         elif route == "post":
             op_both=ssh_call(ip,user_name,password,[cmd])
             print(op_both)
          
