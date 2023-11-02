@@ -168,9 +168,24 @@
     </div>
   
 
-
-
-  
+ 
+    <button id="server_details_btn" class="btn btn-primary" data-mdb-toggle="modal" data-mdb-target="#staticBackdrop1">SERVER_DETAILS</button>
+    <div id="loginModal"  class="modal" tabindex="-1" >
+      
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title" id="heading_server_details">Please Enter the SERVER-DETAILS</h4>
+          </div>
+            <form id="loginForm">
+                <input type="text" class="form-control" name="ip" placeholder="IP">
+                <input type="text"  class="form-control" name="username" placeholder="Username">
+                <input type="password"  class="form-control" name="password" placeholder="Password">
+                <button type="submit" class="btn btn-primary" >save</button>
+                <button type="txt" id="close_btn" name="cancel"  class="btn btn-secondary"  >cancel</button>
+                
+            </form>
+        </div>
+    </div>
 
 </body>
 <script src="{% static 'adding.js' %}"></script>
