@@ -28,3 +28,10 @@ class UserProfileInfo(models.Model):
             ("edit", "Can edit pages"),
         ]
 
+'''
+SERVER LOGIN
+'''
+from django.db import models
+
+class encryptdata(models.Model):
+    encryptdata_field= models.BinaryField()

@@ -224,3 +224,36 @@ document.addEventListener("DOMContentLoaded", function() {
         errorPopup.style.display = 'none';
     });
 });
+
+// Get the modal and buttons
+var loginModal = document.getElementById("loginModal");
+var server_details_btn = document.getElementById("server_details_btn");
+var close_btn = document.getElementById("close_btn");
+
+
+
+// Open the login modal when the button is clicked
+server_details_btn.onclick = function() {
+
+    loginModal.style.display = "block";
+}
+
+// Close the login modal when the close button is clicked
+close_btn.onclick = function() {
+    loginModal.style.display = "none";
+}
+
+// Close the login modal if the user clicks outside of it
+window.onclick = function(event) {
+    if (event.target == loginModal) {
+        loginModal.style.display = "none";
+    }
+}
+
+// Handle login form submission
+var loginForm = document.getElementById("loginForm");
+loginForm.onsubmit = function(e) {
+    e.preventDefault();
+    // Add your login form submission logic here
+    // You can use AJAX to submit the form data to your Django view
+}
