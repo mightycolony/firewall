@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from rules_fetcher_display.models import prerouting,postrouting
+from rules_fetcher_display.models import prerouting,postrouting,ServerDetails
 from rules_fetcher_display.forms import UserForm
 from django.contrib.auth import authenticate,login,logout
 from django.http import HttpResponseRedirect,HttpResponse
@@ -82,3 +82,18 @@ def user_login(request):
     else:
         form = UserForm()
         return render(request,'login.html',{"form":form})
+    
+def serv_det(request):
+        if request.method ==  "POST":
+            try:
+              existing_record = ServerDetails.objects.get(id=1)
+            except ServerDetails.DoesNotExist:
+                pass
+            else:
+                existing_record.username = request.POST.get('username')
+                existing_record.ip = request.POST.get('ip')
+                existing_record.password = request.POST.get('password')
+                existing_record.save()
+            
+        return redirect('rules')
+       

@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 
 from rules_adding import forms 
-from rules_fetcher_display.models import prerouting,postrouting
+from rules_fetcher_display.models import prerouting,postrouting,ServerDetails
 from django.shortcuts import redirect
 from django.views.decorators.cache import never_cache
 from django.contrib.auth.decorators import permission_required
@@ -53,7 +53,10 @@ def get_last_pks(routing):
 @login_required
 @permission_required('rules_fetcher_display.edit')
 def add(request):
-
+   ops=ServerDetails.objects.get(pk=1)
+   print(ops.ip)
+   print(ops.username)
+   print(ops.password)
    if request.method == "POST":
       routing = request.POST.get('routing')
 
@@ -85,8 +88,8 @@ def add(request):
                    #policyid=previous_object_id_pre +1
                    print(policyid)
                    prerouting.objects.get_or_create(**data)
-                   
-                   error_pre=ip_add(routing,"10.0.2.15","root","notu",cmd,policyid,server_data[1])
+
+                   error_pre=ip_add(routing,ops.ip,ops.username,ops.password,cmd,policyid,server_data[1])
                    print(error_pre)
                    if error_pre is not None and len(error_pre) > 1 and error_pre[1]:
                         print("returned error: {} with error code: {}".format(error_pre[0].strip("\n"), error_pre[1]))
@@ -94,7 +97,7 @@ def add(request):
                         request.session['error_msg'] = error_msg
                    else:
                        prerouting.objects.get_or_create(**data)
-                    
+
 
                elif routing == "postrouting":
                    update_last_pks(routing)
@@ -106,7 +109,7 @@ def add(request):
                         form.cleaned_data['destination_ip']
                         ])
                    cmd2=tables_gen_add(routing=server_data[0],sourceip=server_data[1],destinationip=server_data[2])
-                   ip_add(routing,"10.0.2.15","root","notu",cmd2)
+                   ip_add(routing,ops.ip,ops.username,ops.password,cmd2)
                elif routing == "both":
                   print(routing)
                   
@@ -145,7 +148,7 @@ def add(request):
                   else:
                        prerouting.objects.get_or_create(**data)
                        postrouting.objects.get_or_create(source_ip=data['destination_ip'], destination_ip=data['source_ip'], routing=data['routing'])
-                       '''
+                '''
                
    return redirect('rules')
 

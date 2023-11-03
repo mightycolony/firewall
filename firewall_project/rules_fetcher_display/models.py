@@ -31,7 +31,16 @@ class UserProfileInfo(models.Model):
 '''
 SERVER LOGIN
 '''
-from django.db import models
+from argon2 import PasswordHasher
 
-class encryptdata(models.Model):
-    encryptdata_field= models.BinaryField()
+class ServerDetails(models.Model):
+    username = models.CharField(max_length=5)
+    ip = models.CharField(max_length=20)
+    password = models.CharField(max_length=20)
+
+    def save(self, *args, **kwargs):
+        self.pk = 1
+
+        ph = PasswordHasher()
+        self.password = ph.hash(self.password)
+        super(ServerDetails, self).save(*args, **kwargs)
