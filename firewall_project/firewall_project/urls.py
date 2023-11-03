@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from rules_fetcher_display.views import combined_rules,user_login,user_logout
+from rules_fetcher_display.views import combined_rules,user_login,user_logout,serv_det
 from rules_adding.views import add
 from edit_delete_app.views import delete_object,save_object_post
 
@@ -29,6 +29,6 @@ urlpatterns = [
     path('add/', add,name='adding'),
     path('delete/<str:types>/<int:object_id>/',delete_object,name='delete_object'),
     path('save/<str:routing>/<int:saved_id>/',save_object_post,name='save_object_post'),
-    
+    path('serv_det/', serv_det,name='serv_det')
 ]
 

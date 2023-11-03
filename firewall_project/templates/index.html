@@ -175,15 +175,16 @@
         <div class="modal-content">
           <div class="modal-header">
             <h4 class="modal-title" id="heading_server_details">Please Enter the SERVER-DETAILS</h4>
+              <span aria-hidden="true">&times;</span>
           </div>
-            <form id="loginForm">
+            <form id="loginForm" method="POST" action="{% url 'serv_det' %}">
+              {% csrf_token %}
                 <input type="text" class="form-control" name="ip" placeholder="IP">
                 <input type="text"  class="form-control" name="username" placeholder="Username">
                 <input type="password"  class="form-control" name="password" placeholder="Password">
-                <button type="submit" class="btn btn-primary" >save</button>
-                <button type="txt" id="close_btn" name="cancel"  class="btn btn-secondary"  >cancel</button>
-                
+                <input class="btn btn-primary"  type="submit" value="Submit">
             </form>
+
         </div>
     </div>
 
