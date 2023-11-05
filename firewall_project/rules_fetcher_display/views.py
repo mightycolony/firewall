@@ -85,14 +85,18 @@ def user_login(request):
     
 def serv_det(request):
         if request.method ==  "POST":
+            username = request.POST.get('username')
+            ip = request.POST.get('ip')
+            password = request.POST.get('password')
+
             try:
               existing_record = ServerDetails.objects.get(id=1)
             except ServerDetails.DoesNotExist:
-                pass
+                ServerDetails.objects.create(username=username,ip=ip,password=password)
             else:
-                existing_record.username = request.POST.get('username')
-                existing_record.ip = request.POST.get('ip')
-                existing_record.password = request.POST.get('password')
+                existing_record.username = username
+                existing_record.ip = ip
+                existing_record.password = password
                 existing_record.save()
             
         return redirect('rules')

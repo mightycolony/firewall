@@ -39,7 +39,7 @@ p {
     background-color: #fff;
     margin: 5% auto;
     padding: 20px;
-    width: 20%;
+    width: fit-content;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
     border: 1px solid #ccc;
     border-radius: 4px;

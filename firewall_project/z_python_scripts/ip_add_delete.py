@@ -18,11 +18,11 @@ def ssh_call(host,user,passwd,commands):
             
 
         except paramiko.AuthenticationException:
-              print("Authentication failed.")
+              return "Authentication failed."
         except paramiko.SSHException:
-             print("SSH connection failed.")
+             return "SSH connection failed."
         except Exception as e:
-              print(f"An error occurred: {str(e)}")
+              return f"An error occurred: {str(e)}"
         finally:
            client.close()
         return output_list
@@ -31,39 +31,47 @@ def ip_add(routing,ip,user_name,password,cmd,policy_id="None",source_ip="None",r
    
         
     if routing == "prerouting":
-         content = f"auto bond0:{policy_id}\n\tiface bond0:{policy_id} inet static\n\taddress {source_ip}\n\tnetmask 255.255.255.0\n\tgateway 192.168.1.1"
+         content = f"auto enp0s3:{policy_id}\niface enp0s3:{policy_id} inet static\n\taddress {source_ip}\n\tnetmask 255.255.255.0"
          command_check=f"ip a | grep -i {source_ip} | awk -F ' ' '{{print $2}}'"
+         print("login",ip,user_name,password)
          checker=ssh_call(ip,user_name,password,[command_check])
+         print(checker)
          checker_op=checker[0].strip('\n').split('/')[0]
-         #checker_op==checker[0].strip('\n')  #org_one with subnet
-         if checker_op != ip:
-            command1 = f"echo '{content}' | tee /etc/network/interfaces.d/bond0-{policy_id} > /dev/null"
-            command2=f"ifconfig bond0-{policy_id} up"
+         print(checker_op)
+         #checker_op = checker[0].strip('\n')  #org_one with subnet
+         if source_ip not in checker_op:
+            command1 = f"echo '{content}' | tee /etc/network/interfaces.d/enp0s3:{policy_id} > /dev/null"
+            command2=f"ip link set enp0s3:{policy_id}; ifup enp0s3:{policy_id} "
             commands=[command1,command2,cmd]
             op=ssh_call(ip,user_name,password,commands)
             return op
-            
+         else:
+            else_op=ssh_call(ip,user_name,password,[cmd])
+            return else_op
+         
     elif routing == "postrouting":
         op=ssh_call(ip,user_name,password,[cmd])
         print(op)
+          
     elif routing == "both":
          print(route)
          if route == "pre":
-             content = f"auto bond0:{policy_id}\n\tiface bond0:{policy_id} inet static\n\taddress {source_ip}\n\tnetmask 255.255.255.0\n\tgateway 192.168.1.1"
+             content = f"auto enp0s3:{policy_id}\n\tiface enp0s3:{policy_id} inet static\n\taddress {source_ip}\n\tnetmask 255.255.255.0"
              command_check=f"ip a | grep -i {source_ip} | awk -F ' ' '{{print $2}}'"
+             print("cmd_check",command_check)
              checker=ssh_call(ip,user_name,password,[command_check])
              checker_op=checker[0].strip('\n').split('/')[0]
              #checker_op==checker[0].strip('\n')  #org_one with subnet
-             if checker_op != ip:
+             if source_ip not in checker_op:
                 command1 = f"echo '{content}' | tee /etc/network/interfaces.d/bond0-{policy_id} > /dev/null"
-                command2=f"ifconfig bond0-{policy_id} up"
+                command2=f"ip link set enp0s3:{policy_id}; ifup enp0s3:{policy_id} "
                 commands=[command1,command2,cmd]
                 op=ssh_call(ip,user_name,password,commands)
                 return op
          elif route == "post":
-            op_both=ssh_call(ip,user_name,password,[cmd])
-            print(op_both)
-         
+            else_op=ssh_call(ip,user_name,password,[cmd])
+            return else_op
+         ''' 
 
 '''
 def del_add(policy_id):
@@ -74,4 +82,3 @@ def del_add(policy_id):
        command_d = f"rm -rf /etc/network/interfaces.d/bond0-{policy_id}"
        ssh_call("10.0.2.15","root","notu",command_d)
 
-'''

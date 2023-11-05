@@ -36,7 +36,7 @@ from argon2 import PasswordHasher
 class ServerDetails(models.Model):
     username = models.CharField(max_length=5)
     ip = models.CharField(max_length=20)
-    password = models.CharField(max_length=20)
+    password = models.CharField(max_length=100)
 
     def save(self, *args, **kwargs):
         self.pk = 1

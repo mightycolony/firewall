@@ -50,56 +50,6 @@ function toggleInput() {
 }
 
 
-//popup
-
-const popup = document.getElementById('custom-popup');
-const policyId = document.getElementById('policy-id');
-const confirmButton = document.getElementById('popup-confirm');
-const cancelButton = document.getElementById('popup-cancel');
-
-function showPopup(id) {
-    policyId.textContent = id;
-    popup.style.display = 'block';
-}
-function hidePopup() {
-    popup.style.display = 'none';
-}
-cancelButton.addEventListener('click', function () {
-    hidePopup();
-});
-
-//get cookie
-function getCookie(name) {
-    var value = "; " + document.cookie;
-
-    var parts = value.split("; " + name + "=");
-    if (parts.length == 2) return parts.pop().split(";").shift();
-}
-//for deleting routes
-function deleteRow2(button,types) {
-            const object_id = $(button).data('object-id');
-            showPopup(object_id);
-            confirmButton.addEventListener('click', function () { 
-                $.ajax({
-                    url: `/delete/${types}/${object_id}/`, 
-                    type: 'DELETE',
-                    headers: {
-                        'X-CSRFToken': getCookie('csrftoken'), 
-                    },
-                    success: function(response) {
-                        $(button).closest('tr').remove();
-                    },
-                    error: function(xhr, status, error) {
-                        console.error(error);
-                    }
-
-                });
-            //}
-       
-            hidePopup();
-        });
-
-        }
 
 
 
@@ -245,3 +195,8 @@ window.onclick = function(event) {
     }
 }
 
+
+
+
+
+//delete

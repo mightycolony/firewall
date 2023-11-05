@@ -10,6 +10,8 @@ from django.contrib.auth.decorators import login_required
 from z_python_scripts.ip_add_delete import ip_add
 from django.contrib import messages
 from rules_adding.models import LastPK
+from django.db.models import Max
+
 
 #from z_python_scripts import ip_add_delete
 
@@ -29,12 +31,29 @@ def tables_gen_add(routing,sourceip,sourceport=None,protocol=None,destinationip=
 def update_last_pks(routing):
     last_pk_record, created = LastPK.objects.get_or_create(pk=1)
     if routing == "prerouting":
-        last_pk_record.prerouting_last_pk = prerouting.objects.latest('pk').pk
+        try:
+          last_pk_record.prerouting_last_pk = prerouting.objects.all().aggregate(Max('pk'))['pk__max']
+        except prerouting.DoesNotExist:
+            last_pk_record.prerouting_last_pk = prerouting.objects.all().aggregate(Max('pk'))['pk__max']
+
     elif routing == "postrouting":
-        last_pk_record.postrouting_last_pk = postrouting.objects.latest('pk').pk
+        try:
+          last_pk_record.prerouting_last_pk = prerouting.objects.all().aggregate(Max('pk'))['pk__max']
+        except postrouting.DoesNotExist:
+            last_pk_record.postrouting_last_pk = postrouting.objects.all().aggregate(Max('pk'))['pk__max']
+        
+
     elif routing == "both":
-        last_pk_record.prerouting_last_pk = prerouting.objects.latest('pk').pk
-        last_pk_record.postrouting_last_pk = postrouting.objects.latest('pk').pk
+        try:
+          last_pk_record.prerouting_last_pk = prerouting.objects.all().aggregate(Max('pk'))['pk__max']
+          
+        except prerouting.DoesNotExist :
+            last_pk_record.prerouting_last_pk = prerouting.objects.all().aggregate(Max('pk'))['pk__max']
+
+        try:
+            last_pk_record.postrouting_last_pk = postrouting.objects.all().aggregate(Max('pk'))['pk__max']
+        except postrouting.DoesNotExist:
+            last_pk_record.postrouting_last_pk = postrouting.objects.all().aggregate(Max('pk'))['pk__max']
 
     last_pk_record.save()
 
@@ -73,9 +92,9 @@ def add(request):
                server_data2=[]
                data = form.cleaned_data
                routing=data['routing']
-               if routing == "prerouting":   
+               if routing == "prerouting":  
                    update_last_pks(routing)
-                   policyid=get_last_pks(routing)+1
+                   previous_object_id_pre=get_last_pks(routing)+1
                    server_data.extend([
                         form.cleaned_data['routing'],
                         form.cleaned_data['source_ip'],
@@ -85,23 +104,24 @@ def add(request):
                         form.cleaned_data['destination_port']
                         ])
                    cmd=tables_gen_add(routing=server_data[0],sourceip=server_data[1],sourceport=server_data[2],protocol=server_data[3],destinationip=server_data[4],destinationport=server_data[5])
-                   #policyid=previous_object_id_pre +1
-                   print(policyid)
-                   prerouting.objects.get_or_create(**data)
+                   policyid=previous_object_id_pre
+                   print(routing,ops.ip,ops.username,"notu",cmd,policyid,server_data[1])
+                   print(cmd)
 
-                   error_pre=ip_add(routing,ops.ip,ops.username,ops.password,cmd,policyid,server_data[1])
-                   print(error_pre)
+                   error_pre=ip_add(routing,ops.ip,ops.username,"notu",cmd,policyid,server_data[1])
                    if error_pre is not None and len(error_pre) > 1 and error_pre[1]:
                         print("returned error: {} with error code: {}".format(error_pre[0].strip("\n"), error_pre[1]))
                         error_msg="returned error: {} with error code: {}".format(error_pre[0].strip("\n"), error_pre[1])
                         request.session['error_msg'] = error_msg
+               
                    else:
                        prerouting.objects.get_or_create(**data)
 
 
                elif routing == "postrouting":
+                   print("hello")
                    update_last_pks(routing)
-                   #get_last_pks(routing)
+                   print(get_last_pks(routing))
                    postrouting.objects.get_or_create(source_ip=data['destination_ip'], destination_ip=data['source_ip'], routing=data['routing'])
                    server_data.extend([
                         form.cleaned_data['routing'],
@@ -109,10 +129,11 @@ def add(request):
                         form.cleaned_data['destination_ip']
                         ])
                    cmd2=tables_gen_add(routing=server_data[0],sourceip=server_data[1],destinationip=server_data[2])
-                   ip_add(routing,ops.ip,ops.username,ops.password,cmd2)
+                   ip_add(routing,ops.ip,ops.username,"notu",cmd2)
                elif routing == "both":
                   print(routing)
-                  
+                  prerouting.objects.get_or_create(**data)
+                  postrouting.objects.get_or_create(source_ip=data['destination_ip'], destination_ip=data['source_ip'], routing=data['routing'])
                   server_data.extend([
                         form.cleaned_data['routing'],
                         form.cleaned_data['source_ip'],
@@ -128,19 +149,22 @@ def add(request):
                         form.cleaned_data['destination_ip']
                         ])
                   cmd,cmd2 = tables_gen_add(routing=server_data[0],sourceip=server_data[1],sourceport=server_data[2],protocol=server_data[3],destinationip=server_data[4],destinationport=server_data[5])
+                 
                   update_last_pks(routing)
-                  policy_id_both=get_last_pks(routing)
-                  policy_id_both_pre=policy_id_both[0]
-                  policy_id_both_post=policy_id_both[1]
+                  
+                  previous_object_id=get_last_pks(routing)
+                  previous_object_id_pre=previous_object_id[0]
+                  previous_object_id_post=previous_object_id[1]
+                  
+                  print(previous_object_id_pre,previous_object_id_post)
 
-                  policyid_pre= policy_id_both_pre +1
-                  print(policyid_pre)
-
-                  error_both_pre=ip_add(routing,"10.0.2.15","root","notu",cmd,policyid_pre,server_data[1],route="pre")
-                  error_both_post=ip_add(routing,"10.0.2.15","root","notu",cmd2,route="post")
+                  error_both_pre=ip_add(routing,ops.ip,ops.username,"notu",cmd,previous_object_id_pre,server_data[1],route="pre")
                   print(error_both_pre)
+
+
+                  error_both_post=ip_add(routing,ops.ip,ops.username,"notu",cmd2,route="post")
                   print(error_both_post)
-                  '''
+
                   if error_both_pre is not None and len(error_both_pre) > 1 and error_both_pre[1]:
                         print("returned error: {} with error code: {}".format(error_both_pre[0].strip("\n"), error_both_pre[1]))
                         error_msg="returned error: {} with error code: {}".format(error_both_pre[0].strip("\n"), error_both_pre[1])
@@ -148,7 +172,7 @@ def add(request):
                   else:
                        prerouting.objects.get_or_create(**data)
                        postrouting.objects.get_or_create(source_ip=data['destination_ip'], destination_ip=data['source_ip'], routing=data['routing'])
-                '''
+               
                
    return redirect('rules')
 
