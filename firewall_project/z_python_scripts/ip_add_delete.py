@@ -63,7 +63,7 @@ def ip_add(routing,ip,user_name,password,cmd,policy_id="None",source_ip="None",r
              checker_op=checker[0].strip('\n').split('/')[0]
              #checker_op==checker[0].strip('\n')  #org_one with subnet
              if source_ip not in checker_op:
-                command1 = f"echo '{content}' | tee /etc/network/interfaces.d/bond0-{policy_id} > /dev/null"
+                command1 = f"echo '{content}' | tee /etc/network/interfaces.d/enp0s3-{policy_id} > /dev/null"
                 command2=f"ip link set enp0s3:{policy_id}; ifup enp0s3:{policy_id} "
                 commands=[command1,command2,cmd]
                 op=ssh_call(ip,user_name,password,commands)
@@ -71,14 +71,23 @@ def ip_add(routing,ip,user_name,password,cmd,policy_id="None",source_ip="None",r
          elif route == "post":
             else_op=ssh_call(ip,user_name,password,[cmd])
             return else_op
-         ''' 
-
-'''
-def del_add(policy_id):
-
+ 
+def del_pol(types,ip,username,password,cmd,policy_id,source_ip):
+   '''
     command_d=f"ifconfig bond0-{policy_id} down"
     op_d,exit_status_d=ssh_call("10.0.2.15","root","notu",command_d)
     if exit_status_d == 0:
        command_d = f"rm -rf /etc/network/interfaces.d/bond0-{policy_id}"
        ssh_call("10.0.2.15","root","notu",command_d)
+   '''
+   if types == "preroute":
+      del_check_cmd=f"iptables -t nat -L | grep {source_ip} | wc -l"
+      print(ip,username,source_ip)
+      del_check=ssh_call(ip,username,"notu",del_check_cmd)
+      print(del_check)
+      '''if del_check != 0:
+          ssh_call("10.0.2.15","root","notu",cmd)
+          
+          
+'''
 

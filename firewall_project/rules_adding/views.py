@@ -28,44 +28,59 @@ def tables_gen_add(routing,sourceip,sourceport=None,protocol=None,destinationip=
         return tables,tables2
 
 
+
+
 def update_last_pks(routing):
     last_pk_record, created = LastPK.objects.get_or_create(pk=1)
     if routing == "prerouting":
-        try:
-          last_pk_record.prerouting_last_pk = prerouting.objects.all().aggregate(Max('pk'))['pk__max']
-        except prerouting.DoesNotExist:
-            last_pk_record.prerouting_last_pk = prerouting.objects.all().aggregate(Max('pk'))['pk__max']
+        max_prerouting_pk = prerouting.objects.all().aggregate(Max('pk'))['pk__max']
+
+        if max_prerouting_pk is None:
+            last_pk_record.prerouting_last_pk = last_pk_record.prerouting_last_pk
+            last_pk_record.save()
+        if max_prerouting_pk is not None and max_prerouting_pk > last_pk_record.prerouting_last_pk:
+            last_pk_record.prerouting_last_pk = max_prerouting_pk
+            last_pk_record.save()
 
     elif routing == "postrouting":
-        try:
-          last_pk_record.prerouting_last_pk = prerouting.objects.all().aggregate(Max('pk'))['pk__max']
-        except postrouting.DoesNotExist:
-            last_pk_record.postrouting_last_pk = postrouting.objects.all().aggregate(Max('pk'))['pk__max']
-        
+        max_postrouting_pk = postrouting.objects.all().aggregate(Max('pk'))['pk__max']
+        if max_postrouting_pk is None:
+            last_pk_record.postrouting_last_pk = last_pk_record.postrouting_last_pk
+            last_pk_record.save()
+        if max_postrouting_pk is not None and max_postrouting_pk > last_pk_record.postrouting_last_pk:
+            last_pk_record.postrouting_last_pk = max_postrouting_pk
+            last_pk_record.save()
 
     elif routing == "both":
-        try:
-          last_pk_record.prerouting_last_pk = prerouting.objects.all().aggregate(Max('pk'))['pk__max']
-          
-        except prerouting.DoesNotExist :
-            last_pk_record.prerouting_last_pk = prerouting.objects.all().aggregate(Max('pk'))['pk__max']
+        max_prerouting_pk = prerouting.objects.all().aggregate(Max('pk'))['pk__max']
 
-        try:
-            last_pk_record.postrouting_last_pk = postrouting.objects.all().aggregate(Max('pk'))['pk__max']
-        except postrouting.DoesNotExist:
-            last_pk_record.postrouting_last_pk = postrouting.objects.all().aggregate(Max('pk'))['pk__max']
+        if max_prerouting_pk is None:
+            last_pk_record.prerouting_last_pk = last_pk_record.prerouting_last_pk
+            last_pk_record.save()
+        if max_prerouting_pk is not None and max_prerouting_pk > last_pk_record.prerouting_last_pk:
+            last_pk_record.prerouting_last_pk = max_prerouting_pk
+            last_pk_record.save()
 
-    last_pk_record.save()
+
+        max_postrouting_pk = postrouting.objects.all().aggregate(Max('pk'))['pk__max']
+        if max_postrouting_pk is None:
+            last_pk_record.postrouting_last_pk = last_pk_record.postrouting_last_pk
+            last_pk_record.save()
+        if max_postrouting_pk is not None and max_postrouting_pk > last_pk_record.postrouting_last_pk:
+            last_pk_record.postrouting_last_pk = max_postrouting_pk
+            last_pk_record.save()
+
 
 def get_last_pks(routing):
-    last_pk_record, created = LastPK.objects.get_or_create(pk=1)
+    get_last_pk_record, created = LastPK.objects.get_or_create(pk=1)
     if routing == "prerouting":
-        return last_pk_record.prerouting_last_pk
+        return get_last_pk_record.prerouting_last_pk
             
     elif routing == "postrouting":
-        return last_pk_record.postrouting_last_pk
+        return get_last_pk_record.postrouting_last_pk
     elif routing == "both":
-        return last_pk_record.prerouting_last_pk, last_pk_record.postrouting_last_pk
+        return get_last_pk_record.prerouting_last_pk, get_last_pk_record.postrouting_last_pk
+    
 
 # Create your views here.
 @never_cache
@@ -95,6 +110,7 @@ def add(request):
                if routing == "prerouting":  
                    update_last_pks(routing)
                    previous_object_id_pre=get_last_pks(routing)+1
+                   print("policyid",previous_object_id_pre)
                    server_data.extend([
                         form.cleaned_data['routing'],
                         form.cleaned_data['source_ip'],
@@ -119,7 +135,6 @@ def add(request):
 
 
                elif routing == "postrouting":
-                   print("hello")
                    update_last_pks(routing)
                    print(get_last_pks(routing))
                    postrouting.objects.get_or_create(source_ip=data['destination_ip'], destination_ip=data['source_ip'], routing=data['routing'])

@@ -1,4 +1,4 @@
-from rules_fetcher_display.models import prerouting,postrouting
+from rules_fetcher_display.models import prerouting,postrouting,ServerDetails
 from django.shortcuts import redirect
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
@@ -7,6 +7,8 @@ import json
 from django.views.decorators.cache import never_cache
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.decorators import login_required
+
+from z_python_scripts.ip_add_delete import del_pol
 
 
 def tables_gen_delete(routing,sourceip,sourceport=None,protocol=None,destinationip=None,destinationport=None):
@@ -31,11 +33,14 @@ def tables_gen_save(routing,sourceip,sourceport=None,protocol=None,destinationip
 @login_required
 @permission_required('rules_fetcher_display.edit')
 def delete_object(request, object_id,types):
+    serv=ServerDetails.objects.get(pk=1)
     try:
         if types == "preroute":
              obj = get_object_or_404(prerouting, id=object_id)
              cmd=tables_gen_delete(types,obj.source_ip,obj.source_port,obj.protocol,obj.destination_ip,obj.destination_port)
-             print(cmd)
+             print("cmd",cmd)
+             error_both_pre=del_pol(types,serv.ip,serv.username,"notu",cmd,object_id,obj.source_ip)
+             #print(error_both_pre)
              obj.delete()
         elif types == "postroute":
              obj1 = get_object_or_404(postrouting, id=object_id)
