@@ -17,14 +17,14 @@ from django.db.models import Max
 
 def tables_gen_add(routing,sourceip,sourceport=None,protocol=None,destinationip=None,destinationport=None,policy_id=None):
     if routing == "prerouting":
-        tables="iptables -t nat -I PREROUTING {} -d {} -p {} -m {} --dport {} -j DNAT --to-destination {}:{}".format(policy_id,sourceip,protocol,protocol,sourceport,destinationip,destinationport)
+        tables="iptables -t nat -A PREROUTING -m comment --comment policy-{} -d {} -p {} -m {} --dport {} -j DNAT --to-destination {}:{}".format(policy_id,sourceip,protocol,protocol,sourceport,destinationip,destinationport)
         return tables
     elif routing == "postrouting":
-        tables="iptables -t nat -I POSTROUTING {} -d {} -j SNAT --to-source {}".format(policy_id,destinationip,sourceip)
+        tables="iptables -t nat -A POSTROUTING -m comment --comment policy-{} -d {} -j SNAT --to-source {}".format(policy_id,destinationip,sourceip)
         return tables
     elif routing == "both":
-        tables="iptables -t nat -I PREROUTING {} -d {} -p {} -m {} --dport {} -j DNAT --to-destination {}:{}".format(policy_id,sourceip,protocol,protocol,sourceport,destinationip,destinationport)
-        tables2="iptables -t nat -I POSTROUTING {} -d {} -j SNAT --to-source {}".format(policy_id,destinationip,sourceip)
+        tables="iptables -t nat -A PREROUTING -m comment --comment policy-{} -d {} -p {} -m {} --dport {} -j DNAT --to-destination {}:{}".format(policy_id,sourceip,protocol,protocol,sourceport,destinationip,destinationport)
+        tables2="iptables -t nat -A POSTROUTING -m comment --comment policy-{} -d {} -j SNAT --to-source {}".format(policy_id,destinationip,sourceip)
         return tables,tables2
 
 
@@ -111,7 +111,7 @@ def add(request):
                routing=data['routing']
                if routing == "prerouting":  
                    update_last_pks(routing)
-                   previous_object_id_pre=get_last_pks(routing)+1
+                   previous_object_id_pre=get_last_pks(routing)
                    print("policyid",previous_object_id_pre)
                    server_data.extend([
                         form.cleaned_data['routing'],
@@ -139,7 +139,7 @@ def add(request):
                elif routing == "postrouting":
                    update_last_pks(routing)
                    print('policy-id',get_last_pks(routing))
-                   previous_object_id_post=get_last_pks(routing)+1
+                   previous_object_id_post=get_last_pks(routing)
                    
                    postrouting.objects.get_or_create(source_ip=data['destination_ip'], destination_ip=data['source_ip'], routing=data['routing'])
                    server_data.extend([

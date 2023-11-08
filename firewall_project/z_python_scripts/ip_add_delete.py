@@ -74,7 +74,7 @@ def ip_add(routing,ip,user_name,password,cmd,policy_id="None",source_ip="None",r
             else_op=ssh_call(ip,user_name,password,[cmd])
             return else_op
  
-def del_pol(types,ip,username,password,cmd,policy_id,source_ip):
+def del_pol(types,ip=None,username=None,password=None,cmd=None,policy_id=None,destinationip=None):
    '''
     command_d=f"ifconfig bond0-{policy_id} down"
     op_d,exit_status_d=ssh_call("10.0.2.15","root","notu",command_d)
@@ -83,12 +83,15 @@ def del_pol(types,ip,username,password,cmd,policy_id,source_ip):
        ssh_call("10.0.2.15","root","notu",command_d)
    '''
    if types == "postroute":
-      del_check_cmd=f"iptables -t nat -L | grep {source_ip} | wc -l"
-      print(ip,username,source_ip)
-      del_check=ssh_call(ip,username,"notu",del_check_cmd)
-      print(del_check)
-      if del_check != 0:
-          ssh_call(ip,username,"notu",cmd)
+      del_check_cmd="iptables -t nat -L POSTROUTING | awk '{print $5}' | grep -i {} | wc -l".format(destinationip)
+      print(del_check_cmd)
+      print(ip,username,destinationip)
+      del_check=ssh_call(ip,username,"notu",[del_check_cmd])
+      print("error",del_check)
+      print(del_check[0].strip('\n')[0])
+      if int(del_check[0].strip('\n')[0]) > 0:
+          ssh_call(ip,username,password,[cmd])
+
           
           
 
