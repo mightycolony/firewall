@@ -67,8 +67,8 @@ def delete_object(request, object_id,types):
              obj1 = get_object_or_404(postrouting, id=object_id)
              cmd1=tables_gen_delete(types,destinationip=obj1.source_ip,sourceip=obj1.destination_ip,policy_id=post_policy_id)
              print(cmd1)
-             error_both_post=del_pol(types,serv.ip,serv.username,"notu",cmd1,destinationip=obj1.source_ip)
-             print(error_both_post)
+             #error_both_post=del_pol(types,serv.ip,serv.username,"notu",cmd1,destinationip=obj1.source_ip)
+             #print(error_both_post)
              obj1.delete()
         return redirect('rules')    
     except (prerouting.DoesNotExist,postrouting.DoesNotExist):
