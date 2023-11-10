@@ -7,3 +7,5 @@
 
 
 iptables -t nat -A PREROUTING -d 1.1.1.1/32 -p tcp -m tcp --dport 22 -j DNAT --to-destination 2.2.2.2:22
+
+iptables -t nat -R POSTROUTING $(iptables -t nat -L --line-numbers | grep "policy-1" | awk '{print $1}') -m comment --comment "policy-1" -d  10.9.0.1/32 -j SNAT --to-source 10.2.0.6
