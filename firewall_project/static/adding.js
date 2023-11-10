@@ -220,26 +220,29 @@ function getCookie(name) {
     var parts = value.split("; " + name + "=");
     if (parts.length == 2) return parts.pop().split(";").shift();
 }
-//for deleting routes
-function deleteRow2(button,types) {
-            const object_id = $(button).data('object-id');
-            showPopup(object_id);
-            confirmButton.addEventListener('click', function () { 
-                $.ajax({
-                    url: `/delete/${types}/${object_id}/`, 
-                    type: 'DELETE',
-                    headers: {
-                        'X-CSRFToken': getCookie('csrftoken'), 
-                    },
-                    success: function(response) {
-                        $(button).closest('tr').remove();
-                    },
-                    error: function(xhr, status, error) {
-                        console.error(error);
-                    }
-                });
-            //}
-       
-            hidePopup();
-        });
-}
+
+function deleteRow2(button) {
+                object_id = $(button).data('object-id');
+                type_name = $(button).data('type');
+                showPopup(object_id);
+
+                const $confirmButton = $(confirmButton);
+                $confirmButton.off('click').on('click', function () { 
+                    $.ajax({
+                        url: `/delete/${type_name}/${object_id}/`, 
+                        type: 'DELETE',
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken'), 
+                        },
+                        success: function(response) {
+                            $(button).closest('tr').remove();
+                        },
+                        error: function(xhr, status, error) {
+                            console.error(error);
+                        }
+                    });
+                //}
+           
+                hidePopup();
+            });
+            }

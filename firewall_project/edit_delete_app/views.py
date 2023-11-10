@@ -70,6 +70,7 @@ def delete_object(request, object_id,types):
              #error_both_post=del_pol(types,serv.ip,serv.username,"notu",cmd1,destinationip=obj1.source_ip)
              #print(error_both_post)
              obj1.delete()
+             
         return redirect('rules')    
     except (prerouting.DoesNotExist,postrouting.DoesNotExist):
         return HttpResponse("Object not found")
