@@ -88,6 +88,7 @@ def add(request):
                         print('pre_check1', previous_object_id_pre)
 
                     last_pk_pre_check.save()
+                    policyid=previous_object_id_pre
                     server_data.extend([
                             form.cleaned_data['routing'],
                             form.cleaned_data['source_ip'],
@@ -102,16 +103,14 @@ def add(request):
                     #print(routing,ops.ip,ops.username,"wZbGBZy1y5",cmd,policyid,server_data[1])
                     print(cmd)
                     prerouting.objects.get_or_create(**data)
-                    '''
-                    error_pre=ip_add(routing,ops.ip,ops.username,"wZbGBZy1y5",cmd,policyid,server_data[1])
+
+                    error_pre=ip_add(routing,ops.ip,ops.username,"notu",cmd,policyid,sourceip=server_data[1])
                     if error_pre is not None and len(error_pre) > 1 and error_pre[1]:
                             print("returned error: {} with error code: {}".format(error_pre[0].strip("\n"), error_pre[1]))
                             error_msg="returned error: {} with error code: {}".format(error_pre[0].strip("\n"), error_pre[1])
                             request.session['error_msg'] = error_msg
                 
-                    else:
-                        prerouting.objects.get_or_create(**data)
-'''
+
 
                elif routing == "postrouting":
                     max_postrouting_pk = postrouting.objects.all().aggregate(Max('pk'))['pk__max']
@@ -145,7 +144,7 @@ def add(request):
                                 ])
                     cmd2=tables_gen_add(routing=server_data[0],sourceip=server_data[1],destinationip=server_data[2],policy_id=previous_object_id_post)
                     print(cmd2)
-                    #ip_add(routing,ops.ip,ops.username,"wZbGBZy1y5",cmd2)
+                    ip_add(routing,ops.ip,ops.username,"notu",cmd2)
                elif routing == "both":
                   print(routing)
                   ##PREROUTING BLOCK###
@@ -219,12 +218,12 @@ def add(request):
                   cmd2=tables_gen_add(routing="postrouting",sourceip=server_data[1],destinationip=server_data[2],policy_id=previous_object_id_post)
                   print(cmd)
                   print(cmd2)
-                  '''
-                  error_both_pre=ip_add(routing,ops.ip,ops.username,"wZbGBZy1y5",cmd,previous_object_id_pre,server_data[1],route="pre")
+
+                  error_both_pre=ip_add(routing,ops.ip,ops.username,"notu",cmd,previous_object_id_pre,server_data[1],route="pre")
                   print(error_both_pre)
 
 
-                  error_both_post=ip_add(routing,ops.ip,ops.username,"wZbGBZy1y5",cmd2,route="post")
+                  error_both_post=ip_add(routing,ops.ip,ops.username,"notu",cmd2,route="post")
                   print(error_both_post)
 
                   if error_both_pre is not None and len(error_both_pre) > 1 and error_both_pre[1]:
@@ -234,7 +233,7 @@ def add(request):
                   else:
                        prerouting.objects.get_or_create(**data)
                        postrouting.objects.get_or_create(source_ip=data['destination_ip'], destination_ip=data['source_ip'], routing=data['routing'])
-               '''
+
                
    return redirect('rules')
 

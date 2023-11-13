@@ -74,16 +74,29 @@ def ip_add(routing,ip,user_name,password,cmd,policy_id="None",source_ip="None",r
             else_op=ssh_call(ip,user_name,password,[cmd])
             return else_op
  
-def del_pol(types,ip=None,username=None,password=None,cmd=None,policy_id=None,destinationip=None):
+def del_pol(types,ip=None,username=None,password=None,cmd=None,policy_id=None,sourceip=None,destinationip=None):
    '''
-    command_d=f"ifconfig bond0-{policy_id} down"
-    op_d,exit_status_d=ssh_call("10.0.2.15","root","notu",command_d)
-    if exit_status_d == 0:
-       command_d = f"rm -rf /etc/network/interfaces.d/bond0-{policy_id}"
-       ssh_call("10.0.2.15","root","notu",command_d)
+    
    '''
+   if types == "preroute":
+      del_check_cmd="iptables -t nat -L PREROUTING | awk '{{print $5}}' | grep -v -e 'destination' -e '^$' | wc -l".format(sourceip) 
+      op=ssh_call(ip,username,password,[del_check_cmd])
+      print("error",op)
+      print(op[0].strip('\n')[0])
+      if int(op[0].strip('\n')[0]) == 1:
+         policy_from_ipa=f"ip a  | grep {sourceip} | awk '{{print $NF}}'"
+         print(policy_from_ipa)
+         id=ssh_call(ip,username,password,[policy_from_ipa])
+         pol_id=id[0].strip('\n')
+         command_d = f"ifdown {pol_id}; rm -rf /etc/network/interfaces.d/{pol_id}"
+         del_cmd=ssh_call(ip,username,password,[command_d])
+         print(del_cmd)
+         print(pol_id)
+      ssh_call(ip,username,password,[cmd])
+      
+
    if types == "postroute":
-      del_check_cmd="iptables -t nat -L POSTROUTING | awk '{print $5}' | grep -i {} | wc -l".format(destinationip)
+      del_check_cmd="iptables -t nat -L POSTROUTING | grep -i policy-{} | wc -l".format(policy_id)
       print(del_check_cmd)
       print(ip,username,destinationip)
       del_check=ssh_call(ip,username,"notu",[del_check_cmd])
@@ -95,3 +108,28 @@ def del_pol(types,ip=None,username=None,password=None,cmd=None,policy_id=None,de
           
           
 
+def save_pol(routing,ip=None,username=None,password=None,cmd=None,policy_id=None,sourceip=None,destinationip=None,sourceport=None,destinationport=None):
+    if routing == "postrouting":
+        rule_number_check="iptables -t nat -L POSTROUTING --line-numbers | grep 'policy-{}'| awk '{{print $1}}'".format(policy_id)
+        rule_number=ssh_call(ip,username,password,[rule_number_check])
+        
+        rule_num=rule_number[0].strip('\n')
+        print("rule_number",rule_num)
+        save_rule="iptables -t nat -R POSTROUTING {} -m comment --comment 'policy-{}' -d  {} -j SNAT --to-source {}".format(rule_num,policy_id,destinationip,sourceip)
+        print(save_rule)
+        save_ops=ssh_call(ip,username,password,[save_rule])
+        print(save_ops)
+
+
+
+
+    if routing == "prerouting":
+        rule_number_checks="iptables -t nat -L PREROUTING --line-numbers | grep 'policy-{}'| awk '{{print $1}}'".format(policy_id)
+        rule_numbers=ssh_call(ip,username,password,[rule_number_checks])
+        
+        rule_nums=rule_numbers[0].strip('\n')
+        print("rule_number",rule_nums)
+        save_rules="iptables -t nat -R PREROUTING {} -m comment --comment 'policy-{}' -d {} -p tcp -m tcp --dport {} -j DNAT --to-destination {}:{}".format(rule_nums,policy_id,sourceip,sourceport,destinationip,destinationport)
+        print(save_rules)
+        save_opss=ssh_call(ip,username,password,[save_rules])
+        print(save_opss)

@@ -166,7 +166,6 @@ document.addEventListener("DOMContentLoaded", function() {
     const err_msg = errorPopup.getAttribute("data-error-msg")
     errorMessage.textContent=err_msg;
     if (err_msg !==0 && err_msg.trim() !== "None") {
-        console.log("hello")
         errorPopup.style.display = 'block';
     }
 
