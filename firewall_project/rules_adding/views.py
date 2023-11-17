@@ -104,7 +104,7 @@ def add(request):
                     print(cmd)
                     prerouting.objects.get_or_create(**data)
 
-                    error_pre=ip_add(routing,ops.ip,ops.username,"notu",cmd,policyid,sourceip=server_data[1])
+                    error_pre=ip_add(routing,ops.ip,ops.username,"notu",cmd,policyid,source_ip=server_data[1])
                     if error_pre is not None and len(error_pre) > 1 and error_pre[1]:
                             print("returned error: {} with error code: {}".format(error_pre[0].strip("\n"), error_pre[1]))
                             error_msg="returned error: {} with error code: {}".format(error_pre[0].strip("\n"), error_pre[1])

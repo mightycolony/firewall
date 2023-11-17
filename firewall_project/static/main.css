@@ -1,9 +1,15 @@
 body {
     background-color: black;
 }
+
+#server_details_btn{
+    color: white;
+   
+}
 p {
     color: white;
 }
+
 
 #select {
     color: white;
